@@ -97,15 +97,17 @@ function initSigma(config) {
   dataReady = function () {
     //This is called as soon as data is loaded
     a.clusters = {};
+    a.colors = {};
 
     a.iterNodes(function (b) {
       //This is where we populate the array used for the group select box
-
+      b.group = b.attr.attributes.group;
       // note: index may not be consistent for all nodes. Should calculate each time.
       // alert(JSON.stringify(b.attr.attributes[5].val));
       // alert(b.x);
-      a.clusters[b.color] || (a.clusters[b.color] = []);
-      a.clusters[b.color].push(b.id); //SAH: push id not label
+      a.clusters[b.group] || (a.clusters[b.group] = []);
+      a.clusters[b.group].push(b.id); //SAH: push id not label
+      a.colors[b.group] = b.color;
     });
 
     a.bind("upnodes", function (a) {
@@ -291,20 +293,21 @@ function configSigmaElements(config) {
   $GP.bg = $(sigInst._core.domElements.bg);
   $GP.bg2 = $(sigInst._core.domElements.bg2);
   var a = [],
-    b,
-    x = 1;
-  for (b in sigInst.clusters)
+    b = 1;
+  for (b in sigInst.clusters) {
+    var c = sigInst.colors[b];
     a.push(
       '<div style="line-height:12px"><a href="#' +
         b +
         '"><div style="width:40px;height:12px;border:1px solid #fff;background:' +
+        c +
+        ';display:inline-block"></div> <div style="display:inline-block">' +
         b +
-        ';display:inline-block"></div> Group ' +
-        x++ +
-        " (" +
+        "</div> (" +
         sigInst.clusters[b].length +
         " members)</a></div>"
     );
+  }
   //a.sort();
   $GP.cluster.content(a.join(""));
   b = {
@@ -555,8 +558,6 @@ function nodeActive(a) {
   }
 
   var createList = function (c) {
-    console.log(g);
-
     var f = [];
     var e = [],
       //c = sigInst.neighbors,
